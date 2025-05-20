@@ -1,56 +1,49 @@
-# tests/test_usercontroller.py
-
 import pytest
-from unittest.mock import MagicMock
 from src.controllers.usercontroller import UserController
-@pytest.mark.testValidUser
-def test_valid_user():
-    mock_dao = MagicMock()
-    mock_user = {"email": "test@example.com"}
-    mock_dao.find.return_value = [mock_user]
+from unittest.mock import MagicMock
 
-    controller = UserController(dao=mock_dao)
-    user = controller.get_user_by_email("test@example.com")
+# Fixtures
+@pytest.fixture
+def mock_dao():
+    return MagicMock()
 
-    assert user == mock_user
-   
-def test_valid_multiple_users():
-    mock_dao = MagicMock()
-    mock_users = [{"email": "test@example.com"}, {"email": "test@example.com"}]
-    mock_dao.find.return_value = mock_users
+@pytest.fixture
+def controller(mock_dao):
+    return UserController(dao=mock_dao)
 
-    controller = UserController(dao=mock_dao)
-    user = controller.get_user_by_email("test@example.com")
+# Test cases
+def test_get_user_by_email_valid_single_user(controller, mock_dao):
+    mock_dao.find.return_value = [{'email': 'test@example.com'}]
+    result = controller.get_user_by_email('test@example.com')
+    assert result['email'] == 'test@example.com'
 
-    assert user == mock_users[0]
+def test_get_user_by_email_no_user(controller, mock_dao):
+    mock_dao.find.return_value = []
+    result = controller.get_user_by_email('test@example.com')
+    assert result is None
 
-    # Manually assert a "warning" situation
-    assert len(mock_users) == 2, "Warning: more than one user found with email"
- 
+def test_get_user_by_email_multiple_users(controller, mock_dao, capsys):
+    mock_dao.find.return_value = [
+        {'email': 'test@example.com'},
+        {'email': 'test@example.com'}
+    ]
+    result = controller.get_user_by_email('test@example.com')
+    captured = capsys.readouterr()
+    assert result['email'] == 'test@example.com'
+    assert 'more than one user found' in captured.out
 
-# def test_valid_email_no_users_found():
-#     mock_dao = MagicMock()
-#     mock_dao.find.return_value = []
-
-#     controller = UserController(dao=mock_dao)
-#     user = controller.get_user_by_email("notfound@example.com")
-
-#     assert user is None
-
-def test_invalid_email_format():
-    mock_dao = MagicMock()
-    controller = UserController(dao=mock_dao)
-
+@pytest.mark.parametrize("invalid_email", [
+    "invalid-email",
+    "user@domain",
+    "@domain.com",
+    "",
+    "   ",
+])
+def test_get_user_by_email_invalid_format(controller, invalid_email):
     with pytest.raises(ValueError):
-        controller.get_user_by_email("invalid-email")
+        controller.get_user_by_email(invalid_email)
 
-def test_dao_raises_exception():
-    mock_dao = MagicMock()
-    mock_dao.find.side_effect = Exception("Database error")
-
-    controller = UserController(dao=mock_dao)
-
-    with pytest.raises(Exception) as exc_info:
-        controller.get_user_by_email("test@example.com")
-
-    assert "Database error" in str(exc_info.value)
+def test_get_user_by_email_db_failure(controller, mock_dao):
+    mock_dao.find.side_effect = Exception("Database failure")
+    with pytest.raises(Exception):
+        controller.get_user_by_email('test@example.com')
