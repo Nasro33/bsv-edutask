@@ -30,4 +30,4 @@ jobs:
       - name: Run unit tests
         working-directory: ./backend
         run: |
-          python -m user
+          python -m user discover
