@@ -1,12 +1,10 @@
 import pytest
 from src.controllers.usercontroller import UserController
 
-# Simulated user object for test purposes
 class MockUser:
     def __init__(self, email):
         self.email = email
 
-# Fake DAO implementation to simulate database behavior
 @pytest.fixture
 def mock_user_dao():
     class MockDAO:
@@ -73,3 +71,4 @@ def test_dao_exception(mock_user_dao):
         controller.get_user_by_email("fail@example.com")
 
     assert "Simulated DB failure" in str(error_info.value)
+
