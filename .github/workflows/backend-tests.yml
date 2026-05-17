@@ -38,6 +38,4 @@ jobs:
       - name: Run tests
         run: |
           cd backend
-          pytest test/ -v -m "not namespaces"git add .
-git commit -m "fix backend tests"
-git push
+          pytest test/ -v -m "not namespaces"
