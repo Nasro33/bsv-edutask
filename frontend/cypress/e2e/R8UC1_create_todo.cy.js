@@ -130,27 +130,15 @@ describe('R8UC1 - Create Todo Item', () => {
 
       cy.get('input[value="Add"]').click({ force: true })
 
-      // Wait for the intercepted POST to complete
+   
       cy.wait('@createTodo')
-
-      // JUSTIFICATION: On a 400 response the UI catch() branch runs but
-      // does NOT call updateTask() — so the todo list state stays exactly
-      // as it was before the click. We assert count is unchanged.
+   
       cy.get('ul.todo-list')
         .find('li.todo-item')
         .should('have.length', countBefore)
     })
   })
-  // -------------------------------------------------
-  // P3
-  // description=valid | add_button=enabled | task_selected=no
-  // Expected: creation denied (todo panel not visible)
-  // -------------------------------------------------
-  // JUSTIFICATION: With no task selected the Popup is never triggered,
-  // so TaskDetail is never rendered. The todo list, todo input, and
-  // Add button all live inside TaskDetail — they must be absent on
-  // the dashboard when no task is open.
-  // -------------------------------------------------
+
 
   it('P3: should not show todo input when no task is selected', () => {
 
