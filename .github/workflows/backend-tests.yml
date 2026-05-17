@@ -2,30 +2,32 @@ name: Backend Unit Tests
 
 on:
   push:
-    branches: ["**"]
+    branches:
+      - master
+      - workflow
   pull_request:
-    branches: ["main"]
+    branches:
+      - master
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: '3.11'
 
       - name: Install dependencies
         run: |
           cd backend
-          python -m pip install --upgrade pip
           pip install -r requirements.pip
 
-      - name: Run unit tests
+      - name: Run tests
         run: |
           cd backend
-          python -m pytest test/ -v -m "not namespaces"
+          pytest test/ -v -m "not namespaces"
