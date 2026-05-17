@@ -31,10 +31,6 @@ class ValidationHelper:
 
 class ValidationHelper2:
     def __init__(self):
-        """
-        Similar behavior to ValidationHelper,
-        but dependency is hard-coded.
-        """
         self.usercontroller = UserController(
             dao=DAO(collection_name='user')
         )
@@ -53,9 +49,6 @@ class ValidationHelper2:
 
 
 def diceroll():
-    """
-    Roll a simple six sided die and see if you win.
-    """
 
     number = random.randint(1, 6)
 
